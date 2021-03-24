@@ -24,10 +24,3 @@ export class FooterService {
         })
   }
 }
-
-// This callback has to be defined in the global scope.
-function footerCallback(json_data){
-  document.getElementById('footer').outerHTML = json_data[0];
-}
-const _global = (window) as any
-_global.footerCallback = footerCallback
