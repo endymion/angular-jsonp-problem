@@ -9,5 +9,19 @@
 </head>
 <body>
   <app-root></app-root>
+
+  <div id="footer"></div>
+  <script>
+    function footerCallback(json_data){
+      document.getElementById('footer').outerHTML = json_data[0];
+    }
+    window.onload = function() {
+      var script = document.createElement('script');
+      script.src = 'assets/static-footer.json'
+      script.async = true;
+      document.getElementsByTagName('head')[0].appendChild(script);
+    }
+  </script>
+  
 </body>
 </html>
