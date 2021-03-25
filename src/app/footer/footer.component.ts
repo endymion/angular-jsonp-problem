@@ -1,7 +1,9 @@
 import {
   Component,
   AfterViewInit,
-  ChangeDetectionStrategy
+  ChangeDetectionStrategy,
+  ElementRef,
+  Renderer2
 } from '@angular/core';
 
 import { FooterService } from './footer.service'
@@ -14,20 +16,28 @@ import { FooterService } from './footer.service'
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FooterComponent implements AfterViewInit {
-
-  constructor(private footerService: FooterService) { }
+  
+  constructor(private footerService: FooterService,
+    private elementRef: ElementRef,
+    private renderer: Renderer2) { }
 
   ngAfterViewInit() {
-    console.log("ngAfterViewInit()")
-    console.log("footer: " + JSON.stringify(this.footerService.getFooter()))
+    this.addScript();
+    this.footerService.getFooter().subscribe((data: string[]) => { this.footerCallback(data) });
   }
 
-}
+  private addScript() {
+    // Wrap the ng_jsonp_callback_0 with footerCallback 
+    const scriptSrc = `window.footerCallback = function(json_data) {window.ng_jsonp_callback_0(json_data);}`;
+    const scriptElement: HTMLScriptElement = this.renderer.createElement('script');
+    scriptElement.innerHTML = scriptSrc;
+    this.renderer.appendChild(this.elementRef.nativeElement, scriptElement);
+  }
 
-// This callback has to be defined in the global scope.
-function footerCallback(json_data){
-  document.getElementById('footer').outerHTML = json_data[0];
+  // Insert a new Element with the json_data
+  private footerCallback(json_data: string[]) {
+    const footerElement: HTMLElement = this.renderer.createElement('div');
+    footerElement.innerHTML = json_data[0];
+    this.renderer.appendChild(this.elementRef.nativeElement, footerElement);
+  }
 }
-const _global = (window) as any
-_global.footerCallback = footerCallback
-

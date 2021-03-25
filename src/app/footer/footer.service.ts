@@ -15,12 +15,9 @@ export class FooterService {
 
   constructor(private http: HttpClient) { }
 
-  footerURL = 'assets/footer.min.json';
+  footerURL = 'https://footers.hakkasangroup.com/footer.min.json';
 
   public getFooter() {  
     return this.http.jsonp(this.footerURL,'callback')
-        .subscribe(data => {
-          console.log('data: ' + JSON.stringify(data));
-        })
   }
 }
