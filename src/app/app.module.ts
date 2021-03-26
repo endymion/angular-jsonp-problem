@@ -8,7 +8,6 @@ import {
 
 import { AppComponent } from './app.component';
 import { FooterComponent } from './footer/footer.component';
-import { FooterService } from './footer/footer.service'
 
 @NgModule({
   declarations: [
@@ -20,7 +19,7 @@ import { FooterService } from './footer/footer.service'
     HttpClientModule,
     HttpClientJsonpModule
   ],
-  providers: [ FooterService ],
+  providers: [],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

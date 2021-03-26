@@ -1,43 +1,38 @@
 import {
-  Component,
-  AfterViewInit,
-  ChangeDetectionStrategy,
+  Renderer2,
   ElementRef,
-  Renderer2
-} from '@angular/core';
-
-import { FooterService } from './footer.service'
+  ChangeDetectionStrategy,
+  AfterViewInit,
+  Component } from '@angular/core';
 
 @Component({
   selector: 'app-footer',
   templateUrl: './footer.component.html',
   styleUrls: ['./footer.component.scss'],
-  providers:  [ FooterService ],
+  providers:  [],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class FooterComponent implements AfterViewInit {
   
-  constructor(private footerService: FooterService,
-    private elementRef: ElementRef,
-    private renderer: Renderer2) { }
+  constructor(
+    private renderer2: Renderer2,
+    private el: ElementRef
+  ) {}
 
   ngAfterViewInit() {
-    this.addScript();
-    this.footerService.getFooter().subscribe((data: string[]) => { this.footerCallback(data) });
-  }
-
-  private addScript() {
-    // Wrap the ng_jsonp_callback_0 with footerCallback 
-    const scriptSrc = `window.footerCallback = function(json_data) {window.ng_jsonp_callback_0(json_data);}`;
-    const scriptElement: HTMLScriptElement = this.renderer.createElement('script');
-    scriptElement.innerHTML = scriptSrc;
-    this.renderer.appendChild(this.elementRef.nativeElement, scriptElement);
-  }
-
-  // Insert a new Element with the json_data
-  private footerCallback(json_data: string[]) {
-    const footerElement: HTMLElement = this.renderer.createElement('div');
-    footerElement.innerHTML = json_data[0];
-    this.renderer.appendChild(this.elementRef.nativeElement, footerElement);
+    const s = this.renderer2.createElement('script');
+    s.type = 'text/javascript';
+    s.text = `
+      function footerCallback(json_data){
+        document.getElementById('footer').outerHTML = json_data[0];
+      }
+      window.onload = function() {
+        var script = document.createElement('script');
+        script.src = 'assets/static-footer.json'
+        script.async = true;
+        document.getElementsByTagName('head')[0].appendChild(script);
+      }
+    `.trim();
+    this.renderer2.appendChild(this.el.nativeElement, s);
   }
 }
